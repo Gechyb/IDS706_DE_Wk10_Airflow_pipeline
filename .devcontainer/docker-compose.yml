@@ -1,5 +1,6 @@
 
-x-airflow-common: &airflow-common
+x-airflow-common: 
+  &airflow-common
   build:
     context: ..            
     dockerfile: .devcontainer/.Dockerfile
