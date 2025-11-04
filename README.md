@@ -1,10 +1,28 @@
 # 🎬 MovieLens End-to-End ETL & Analysis Pipeline
+![Airflow](https://img.shields.io/badge/Apache%20Airflow-3.1.1-blue)
+![Python](https://img.shields.io/badge/Python-3.12-green)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-336791)
+![Docker](https://img.shields.io/badge/Docker-Compose-2496ED)
 
 **Author:** Ogechukwu Ezenwa  
 **Date:** November 4, 2025  
 **Course:** IDS 706 – Data Engineering Systems  
 **Assignment:** Data Orchestration with Airflow
 ---
+
+## Table of Contents
+- [Project Overview](#project-overview)
+- [Dataset Information](#dataset-information)
+- [Project Structure](#project-struture)
+- [Pipeline Stages](#pipeline-stages)
+- [Setup & Run](#setup--run)
+  - [1. Clone the Repository](#1-clone-the-repository)
+  - [2. Build and Start Services](#2-build-and-start-services)
+  - [3. Access the Airflow Web UI](#3-access-the-airflow-web-ui)
+  - [4. Trigger the DAG](#4-trigger-the-dag)
+- [Screenshots](#screenshots)
+- [Results](#results)
+
 
 ## Project Overview
 This project implements a complete **data engineering pipeline** using **Apache Airflow**.  
@@ -14,7 +32,26 @@ The pipeline demonstrates orchestration, task parallelism, database integration,
 **Goal:**  
 To build a reproducible workflow that prepares movie and rating data for analytical modeling while showcasing best practices in modern ETL pipeline design.
 
+- **Parallel Transformations** with an Airflow **TaskGroup**
+- **Merging** related datasets (`movies.csv` + `ratings.csv`)
+- **PostgreSQL Integration** for warehousing and analysis
+- **Machine Learning** (predict average rating from year + genres)
+- **Artifacts** (plot + metrics) and **automated cleanup**
+- Only **file paths** passed via XCom (no large payloads)
+
 ---
+
+## Dataset Information
+
+**Source:**  
+[MovieLens Small Dataset (GroupLens)](https://files.grouplens.org/datasets/movielens/ml-latest-small.zip)
+
+**Files Used**
+- `movies.csv` — `movieId`, `title`, `genres`
+- `ratings.csv` — `userId`, `movieId`, `rating`, `timestamp`
+
+**Join Key**  
+`movieId`
 
 ## Project Struture
 ```bash
@@ -64,7 +101,7 @@ git clone git@github.com:Gechyb/IDS706_DE_Wk10_Airflow_pipeline.git
 - **Apache Airflow** – Orchestration and scheduling  
 - **PostgreSQL** – Data storage backend  
 - **Docker Compose** – Containerized environment  
-- **pandas / scikit-learn** – Data wrangling and ML analysis  
+- **pandas / pyspark / scikit-learn** – Data wrangling and ML analysis  
 - **SQLAlchemy** – Database connection layer  
 - **Celery + Redis** – Parallel task execution 
 
@@ -98,9 +135,23 @@ Successful DAG Execution
 
 Screenshot of the Grid View showing all green (success) tasks below:
 
-![alt text](dag_success/dag_Airflow_UI.png)
+![DAG Graph View](dag_success/dag_Airflow_UI.png)
 
 DAG Graph View
 
 Screenshot of the Graph View showing the full workflow below:
-![alt text](dag_success/dag_graph.png)
+![Successful DAG Execution](dag_success/dag_graph.png)
+
+
+## Results
+
+- Successfully processes and loads MovieLens data into PostgreSQL.
+- Produces:
+    - A merged dataset in data/processed/
+    - A scatter plot of predicted vs. actual mean ratings (data/artifacts/predicted_vs_actual.png)
+    - A metrics summary file (data/artifacts/metrics.txt)
+- Demonstrates:
+    - Data ingestion and cleaning
+    - Parallel task orchestration
+    - Database integration
+    - Simple analytical modeling
