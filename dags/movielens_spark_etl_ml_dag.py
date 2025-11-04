@@ -1,3 +1,18 @@
+"""
+AAirflow DAG: MovieLens End-to-End ETL and Analysis Pipeline
+Author: Ogechukwu Blessing Ezenwa
+Date: 2025-11-03
+
+Description:
+This Airflow pipeline automates the ingestion, transformation, merging, loading, and
+analysis of the MovieLens dataset. It demonstrates an end-to-end data engineering
+workflow with task parallelism, modular design, and database integration.
+
+Datasets:
+- movies.csv — contains movie IDs, titles, and genres
+- ratings.csv — contains user ratings for movies along with timestamps
+"""
+
 from __future__ import annotations
 import os, io, zipfile, shutil
 from datetime import datetime
