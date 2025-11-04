@@ -37,6 +37,7 @@ To build a reproducible workflow that prepares movie and rating data for analyti
 │   └── .Dockerfile                          # Custom Airflow image
 ├── plugins/                                 # (Optional) custom Airflow plugins
 ├── logs/                                    # Airflow logs
+├── requirements.txt                         # packages to install
 └── README.md
 
     
@@ -51,7 +52,13 @@ To build a reproducible workflow that prepares movie and rating data for analyti
 | **4. Analyze** | Read `movies_features` from Postgres; train **LinearRegression** to predict `rating_mean` from `year` + genre dummies; save plot & metrics. | `scikit-learn`, `matplotlib` |
 | **5. Cleanup** | Remove extracted raw folder and any `.parquet` in `data/tmp/`; keep processed data & artifacts. | `shutil`, Airflow `@task` |
 
-## Usage
+## Setup & Run
+
+### 1. Clone the repository
+```bash
+cd <directory>
+git clone git@github.com:Gechyb/IDS706_DE_Wk10_Airflow_pipeline.git
+```
 
 **Technologies Used**
 - **Apache Airflow** – Orchestration and scheduling  
@@ -61,18 +68,39 @@ To build a reproducible workflow that prepares movie and rating data for analyti
 - **SQLAlchemy** – Database connection layer  
 - **Celery + Redis** – Parallel task execution 
 
-**High-Level Architecture**
+### 2. Build and start services
 
+```bash
+docker compose -f .devcontainer/docker-compose.yml build
+docker compose -f .devcontainer/docker-compose.yml up airflow-init
+docker compose -f .devcontainer/docker-compose.yml up -d
 ```
 Login into http://localhost:8080/ 
 Username:airflow
 Password:airflow
 
+### 3. Access the Airflow Web UI
 
-Build docker and start
+- URL: http://localhost:8080
+- Username: airflow
+- Password: airflow
 
-docker compose -f .devcontainer/docker-compose.yml build
-docker compose -f .devcontainer/docker-compose.yml up airflow-init
-docker compose -f .devcontainer/docker-compose.yml up -d
+### 4. Trigger the DAG
 
+- DAG ID: movielens_end_to_end_parallel
+- In the Airflow Web UI:
+    1. Unpause the DAG
+    2. Trigger it manually
+    3. Wait for all tasks to complete (they should turn green ✅)
 
+## Screenshots
+Successful DAG Execution
+
+Screenshot of the Grid View showing all green (success) tasks below:
+
+![alt text](dag_success/dag_Airflow_UI.png)
+
+DAG Graph View
+
+Screenshot of the Graph View showing the full workflow below:
+![alt text](dag_success/dag_graph.png)
