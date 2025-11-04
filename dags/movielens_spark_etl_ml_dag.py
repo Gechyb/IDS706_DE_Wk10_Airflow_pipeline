@@ -24,9 +24,8 @@ from airflow import DAG
 from airflow.decorators import task
 from airflow.utils.task_group import TaskGroup
 
-# -------------------------
+
 # Paths & Config
-# -------------------------
 RAW_DIR = Path("/opt/airflow/data/raw")
 TMP_DIR = Path("/opt/airflow/data/tmp")
 PROC_DIR = Path("/opt/airflow/data/processed")
@@ -52,16 +51,14 @@ with DAG(
     dag_id="movielens_spark_etl_ml",
     description="Pandas+Spark ETL: ingest movies/ratings, transform (parallel), merge (Spark), load Postgres, analyze, cleanup.",
     start_date=datetime(2025, 1, 1),
-    schedule="0 2 * * *",  # daily 02:00
+    schedule="@once",  # "00 22 * * *"
     catchup=False,
     default_args=default_args,
     max_active_runs=1,
     tags=["assignment", "etl", "spark", "parallel"],
 ) as dag:
 
-    # -------------------------
     # Ingestion
-    # -------------------------
     @task
     def download_and_extract_zip(execution_date: str) -> dict:
         """
@@ -92,9 +89,7 @@ with DAG(
             "base_dir": str(base),
         }
 
-    # -------------------------
     # Transform (Parallel via TaskGroup)
-    # -------------------------
     with TaskGroup(group_id="transform_group") as transform_group:
 
         @task
@@ -155,9 +150,7 @@ with DAG(
             spark.stop()
             return out  # only path via XCom
 
-    # -------------------------
     # Merge (Spark) -> Parquet
-    # -------------------------
     @task
     def spark_merge(movies_path: str, ratings_path: str, execution_date: str) -> str:
         """
@@ -190,9 +183,7 @@ with DAG(
         spark.stop()
         return out  # only path via XCom
 
-    # -------------------------
     # Load to Postgres (from Parquet)
-    # -------------------------
     @task
     def load_to_postgres(merged_parquet_path: str) -> str:
         """
@@ -213,9 +204,7 @@ with DAG(
         engine.dispose()
         return "movies_features"
 
-    # -------------------------
     # Analysis (read from DB -> sklearn -> artifacts)
-    # -------------------------
     @task
     def analyze_and_model() -> str:
         """
@@ -271,9 +260,7 @@ with DAG(
 
         return f"Artifacts saved: {plot_path} , {metrics_path}"
 
-    # -------------------------
     # Cleanup intermediates
-    # -------------------------
     @task
     def cleanup(paths: dict, execution_date: str) -> str:
         """
@@ -292,9 +279,7 @@ with DAG(
 
         return f"Cleaned {base} and tmp parquet files."
 
-    # -------------------------
     # Orchestration / Dependencies
-    # -------------------------
     z = download_and_extract_zip(execution_date="{{ ds_nodash }}")
 
     with transform_group:
