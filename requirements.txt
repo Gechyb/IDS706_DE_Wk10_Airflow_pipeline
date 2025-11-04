@@ -1,2 +1,9 @@
+
 Faker==37.12.0
 apache-airflow-providers-postgres
+pyspark
+pyarrow
+psycopg2-binary
+SQLAlchemy
+scikit-learn
+matplotlib
